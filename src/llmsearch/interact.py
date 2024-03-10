@@ -32,14 +32,3 @@ def qa_with_llm(llm_bundle: LLMBundle, config: Config):
             config=config,
         )
         print_llm_response(output)
-
-def retrieve_with_llm(llm_bundle: LLMBundle, config: Config):
-    while True:
-        question = input("\nENTER QUESTION >> ")
-        most_relevant_docs, score = get_and_parse_response(
-            query=question,
-            llm_bundle=llm_bundle,
-            config=config
-        )
-        print(most_relevant_docs)
-        print(score)

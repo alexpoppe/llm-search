@@ -6,7 +6,7 @@ import streamlit.web.cli
 from llmsearch.chroma import VectorStoreChroma
 from llmsearch.splade import SparseEmbeddingsSplade
 from llmsearch.config import get_config
-from llmsearch.interact import qa_with_llm, retrieve_with_llm
+from llmsearch.interact import qa_with_llm
 from llmsearch.parsers.splitter import DocumentSplitter
 from llmsearch.utils import get_llm_bundle, set_cache_folder
 from llmsearch.embeddings import create_embeddings, update_embeddings
@@ -19,11 +19,7 @@ def index_group():
 
 @click.group(name="interact")
 def interact_group():
-    """Commands to interact in Q&A session with embedded content using LLMs"""
-    
-@click.group(name="retrieve")
-def retrieve_group():
-    """Commands to retrieve documents with embedded content using LLMs"""
+    """Commands to interact in Q&A sessiont with embedded content using LLMs"""
 
 @click.group
 def main_cli():
@@ -83,20 +79,6 @@ def launch_qa_with_llm(config_file: str):
     config = get_config(config_file)
     llm_bundle = get_llm_bundle(config)
     qa_with_llm(llm_bundle, config)
-    
-@click.command("llm")
-@click.option(
-    "--config-file",
-    "-c",
-    "config_file",
-    required=True,
-    type=click.Path(exists=True, dir_okay=False),
-    help="Specifies YAML configuration file",
-)
-def retrieve(config_file: str):
-    config = get_config(config_file)
-    llm_bundle = get_llm_bundle(config)
-    retrieve_with_llm(llm_bundle, config)
 
 @click.command("webapp")
 @click.option(
@@ -121,7 +103,6 @@ def launch_streamlit(config_file: str):
 index_group.add_command(generate_index)
 index_group.add_command(udpate_index)
 interact_group.add_command(launch_qa_with_llm)
-retrieve_group.add_command(retrieve)
 
 index_group.add_command(generate_index)
 interact_group.add_command(launch_qa_with_llm)
@@ -130,7 +111,6 @@ interact_group.add_command(launch_streamlit)
 # add command groups to CLI root
 main_cli.add_command(index_group)
 main_cli.add_command(interact_group)
-main_cli.add_command(retrieve_group)
 
 if __name__ == "__main__":
     main_cli()
