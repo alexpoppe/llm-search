@@ -84,19 +84,19 @@ def launch_qa_with_llm(config_file: str):
     llm_bundle = get_llm_bundle(config)
     qa_with_llm(llm_bundle, config)
     
-# @click.command("llm")
-# @click.option(
-#     "--config-file",
-#     "-c",
-#     "config_file",
-#     required=True,
-#     type=click.Path(exists=True, dir_okay=False),
-#     help="Specifies YAML configuration file",
-# )
-# def retrieve(config_file: str):
-#     config = get_config(config_file)
-#     llm_bundle = get_llm_bundle(config)
-#     retrieve_with_llm(llm_bundle, config)
+@click.command("llm")
+@click.option(
+    "--config-file",
+    "-c",
+    "config_file",
+    required=True,
+    type=click.Path(exists=True, dir_okay=False),
+    help="Specifies YAML configuration file",
+)
+def retrieve(config_file: str):
+    config = get_config(config_file)
+    llm_bundle = get_llm_bundle(config)
+    retrieve_with_llm(llm_bundle, config)
 
 @click.command("webapp")
 @click.option(
@@ -121,7 +121,7 @@ def launch_streamlit(config_file: str):
 index_group.add_command(generate_index)
 index_group.add_command(udpate_index)
 interact_group.add_command(launch_qa_with_llm)
-# retrieve_group.add_command(retrieve)
+retrieve_group.add_command(retrieve)
 
 index_group.add_command(generate_index)
 interact_group.add_command(launch_qa_with_llm)
