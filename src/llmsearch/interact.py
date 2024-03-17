@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from termcolor import cprint
 
 from llmsearch.config import Config, ResponseModel
-from llmsearch.process import get_and_parse_response
+from llmsearch.process import get_and_parse_response, get_relevant_docs
 from llmsearch.utils import LLMBundle
 
 load_dotenv()
@@ -36,7 +36,7 @@ def qa_with_llm(llm_bundle: LLMBundle, config: Config):
 def retrieve_with_llm(llm_bundle: LLMBundle, config: Config):
     while True:
         question = input("\nENTER QUESTION >> ")
-        most_relevant_docs, score = get_and_parse_response(
+        most_relevant_docs, score = get_relevant_docs(
             query=question,
             llm_bundle=llm_bundle,
             config=config
