@@ -5,7 +5,7 @@ from llmsearch.models.config import (
     LlamaModelConfig,
     #    AutoGPTQModelConfig,
     HuggingFaceModelConfig,
-    AzureOpenAIModelConfig
+    AzureOpenAIModelConfig,
 )
 
 from llmsearch.models.llama import LlamaModel
@@ -19,7 +19,7 @@ model_mappings = {
     LlamaModelConfig: LlamaModel,
     HuggingFaceModelConfig: HuggingFaceModel,
     OpenAIModelConfig: OpenAIModel,
-    AzureOpenAIModelConfig: AzureOpenAIModel
+    AzureOpenAIModelConfig: AzureOpenAIModel,
     #  AutoGPTQModelConfig: AutoGPTQModel,
 }
 

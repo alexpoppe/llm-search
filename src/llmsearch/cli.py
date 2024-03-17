@@ -4,10 +4,8 @@ import os
 import streamlit.web.cli
 
 from llmsearch.chroma import VectorStoreChroma
-from llmsearch.splade import SparseEmbeddingsSplade
-from llmsearch.config import get_config
-from llmsearch.interact import qa_with_llm, retrieve_with_llm
-from llmsearch.parsers.splitter import DocumentSplitter
+from llmsearch.config import get_config, get_doc_with_model_config
+from llmsearch.interact import qa_with_llm
 from llmsearch.utils import get_llm_bundle, set_cache_folder
 from llmsearch.embeddings import create_embeddings, update_embeddings
 
@@ -24,6 +22,7 @@ def interact_group():
 @click.group(name="retrieve")
 def retrieve_group():
     """Commands to retrieve documents with embedded content using LLMs"""
+
 
 @click.group
 def main_cli():
@@ -44,10 +43,10 @@ def generate_index(config_file: str):
     set_cache_folder(str(config.cache_folder))
 
     vs = VectorStoreChroma(
-        persist_folder=str(config.embeddings.embeddings_path),
-        config=config
+        persist_folder=str(config.embeddings.embeddings_path), config=config
     )
     create_embeddings(config, vs)
+
 
 @click.command(name="update")
 @click.option(
@@ -63,8 +62,7 @@ def udpate_index(config_file: str):
     set_cache_folder(str(config.cache_folder))
 
     vs = VectorStoreChroma(
-        persist_folder=str(config.embeddings.embeddings_path),
-        config=config
+        persist_folder=str(config.embeddings.embeddings_path), config=config
     )
     stats = update_embeddings(config, vs)
     logger.info(stats)
@@ -72,15 +70,23 @@ def udpate_index(config_file: str):
 
 @click.command("llm")
 @click.option(
-    "--config-file",
+    "--doc-config-file",
     "-c",
-    "config_file",
+    "doc_config_file",
     required=True,
-    type=click.Path(exists=True, dir_okay=False),
-    help="Specifies YAML configuration file",
+    type=click.Path(exists=True, dir_okay=False, file_okay=True),
+    help="Specifies documents YAML configuration file",
 )
-def launch_qa_with_llm(config_file: str):
-    config = get_config(config_file)
+@click.option(
+    "--model-config-file",
+    "-m",
+    "model_config_file",
+    required=True,
+    type=click.Path(exists=True, dir_okay=False, file_okay=True),
+    help="Specifies model YAML configuration file",
+)
+def launch_qa_with_llm(doc_config_file: str, model_config_file: str):
+    config = get_doc_with_model_config(doc_config_file, model_config_file)
     llm_bundle = get_llm_bundle(config)
     qa_with_llm(llm_bundle, config)
     
@@ -98,23 +104,37 @@ def launch_qa_with_llm(config_file: str):
 #     llm_bundle = get_llm_bundle(config)
 #     retrieve_with_llm(llm_bundle, config)
 
+
 @click.command("webapp")
 @click.option(
-    "--config-file",
+    "--doc-config-path",
     "-c",
-    "config_file",
+    "doc_config_path",
     required=True,
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
-    help="Specifies YAML configuration file",
+    help="Specifies documents YAML configuration file",
 )
-def launch_streamlit(config_file: str):
+@click.option(
+    "--model-config-file",
+    "-m",
+    "model_config_file",
+    required=True,
+    type=click.Path(exists=True, dir_okay=False, file_okay=True),
+    help="Specifies model YAML configuration file",
+)
+def launch_streamlit(doc_config_path: str, model_config_file: str):
     # Based on
     # https://discuss.streamlit.io/t/running-streamlit-inside-my-own-executable-with-the-click-module/1198/4
     # streamlit run ./src/llmsearch/webapp.py -- --config_path ./sample_templates/obsidian_conf.yaml
-    
+
     dirname = os.path.dirname(__file__)
-    filename = os.path.join(dirname, 'webapp.py')
-    args = ["--config_path", config_file]
+    filename = os.path.join(dirname, "webapp.py")
+    args = [
+        "--doc_config_path",
+        doc_config_path,
+        "--model_config_path",
+        model_config_file,
+    ]
     streamlit.web.cli._main_run(filename, args)
 
 
