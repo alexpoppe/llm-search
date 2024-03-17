@@ -92,12 +92,12 @@ def launch_qa_with_llm(doc_config_file: str, model_config_file: str):
     
 @click.command("answer")
 @click.option(
-    "--config-file",
+    "--doc-config-file",
     "-c",
-    "config_file",
+    "doc_config_file",
     required=True,
-    type=click.Path(exists=True, dir_okay=False),
-    help="Specifies YAML configuration file",
+    type=click.Path(exists=True, dir_okay=False, file_okay=True),
+    help="Specifies documents YAML configuration file",
 )
 @click.option(
     "--model-config-file",
@@ -107,8 +107,8 @@ def launch_qa_with_llm(doc_config_file: str, model_config_file: str):
     type=click.Path(exists=True, dir_okay=False, file_okay=True),
     help="Specifies model YAML configuration file",
 )
-def retrieve(config_file: str):
-    config = get_config(config_file)
+def retrieve(doc_config_file: str, model_config_file: str):
+    config = get_doc_with_model_config(doc_config_file, model_config_file)
     llm_bundle = get_llm_bundle(config)
     retrieve_with_llm(llm_bundle, config)
 
