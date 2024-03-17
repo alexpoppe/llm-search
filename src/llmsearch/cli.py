@@ -5,7 +5,7 @@ import streamlit.web.cli
 
 from llmsearch.chroma import VectorStoreChroma
 from llmsearch.config import get_config, get_doc_with_model_config
-from llmsearch.interact import qa_with_llm
+from llmsearch.interact import qa_with_llm, retrieve_with_llm
 from llmsearch.utils import get_llm_bundle, set_cache_folder
 from llmsearch.embeddings import create_embeddings, update_embeddings
 
@@ -90,19 +90,27 @@ def launch_qa_with_llm(doc_config_file: str, model_config_file: str):
     llm_bundle = get_llm_bundle(config)
     qa_with_llm(llm_bundle, config)
     
-# @click.command("llm")
-# @click.option(
-#     "--config-file",
-#     "-c",
-#     "config_file",
-#     required=True,
-#     type=click.Path(exists=True, dir_okay=False),
-#     help="Specifies YAML configuration file",
-# )
-# def retrieve(config_file: str):
-#     config = get_config(config_file)
-#     llm_bundle = get_llm_bundle(config)
-#     retrieve_with_llm(llm_bundle, config)
+@click.command("answer")
+@click.option(
+    "--config-file",
+    "-c",
+    "config_file",
+    required=True,
+    type=click.Path(exists=True, dir_okay=False),
+    help="Specifies YAML configuration file",
+)
+@click.option(
+    "--model-config-file",
+    "-m",
+    "model_config_file",
+    required=True,
+    type=click.Path(exists=True, dir_okay=False, file_okay=True),
+    help="Specifies model YAML configuration file",
+)
+def retrieve(config_file: str):
+    config = get_config(config_file)
+    llm_bundle = get_llm_bundle(config)
+    retrieve_with_llm(llm_bundle, config)
 
 
 @click.command("webapp")
@@ -141,7 +149,7 @@ def launch_streamlit(doc_config_path: str, model_config_file: str):
 index_group.add_command(generate_index)
 index_group.add_command(udpate_index)
 interact_group.add_command(launch_qa_with_llm)
-# retrieve_group.add_command(retrieve)
+retrieve_group.add_command(retrieve)
 
 index_group.add_command(generate_index)
 interact_group.add_command(launch_qa_with_llm)
