@@ -101,6 +101,33 @@ def get_and_parse_response(
             session.close()
     return out
 
+def get_relevant_docs(
+    llm_bundle: LLMBundle,
+    query: str,
+    config: Config,
+    label: str = "",
+):
+    original_query = query
+
+    queries = []
+    hyde_response = ""
+    # Add HYDE queries, if required
+    if llm_bundle.hyde_enabled:
+        hyde_response = get_hyde_response(llm_bundle, query)
+        queries += [hyde_response]
+
+    elif llm_bundle.multiquery_enabled:
+        queries += get_multiquery_response(
+            llm_bundle, query, config.semantic_search.multiquery.n_versions
+        )
+    else:
+        queries = [query]
+
+    semantic_search_config = config.semantic_search
+    most_relevant_docs, score = get_relevant_documents(
+        original_query, queries, llm_bundle, semantic_search_config, label=label
+    )
+    return most_relevant_docs, score
 
 def process_obsidian_uri(
     doc_name: str, adv_uri_config: ObsidianAdvancedURI, metadata: dict
